@@ -40,6 +40,54 @@ public class Maze
                     room.setNeighbor( Room.EAST, roomGrid[gridX+1][gridY] );
             }
         }
+
+        ArrayList<Room> activeRoomList = new ArrayList<Room>();
+        Room currentRoom = roomGrid[0][0];
+        currentRoom.setConnected(true);
+        activeRoomList.add(0, currentRoom);
+
+        float branchProbability = 0.5f;
+        while (activeRoomList.size() > 0)
+        {
+            if (Math.random() < branchProbability)
+            {
+                // get random previously visited room
+                int roomIndex = (int)(Math.random() * activeRoomList.size());
+                currentRoom = activeRoomList.get(roomIndex);
+            }
+            else
+            {
+                // get the most recently visited room
+                currentRoom = activeRoomList.get(activeRoomList.size() - 1);
+            }
+            if ( currentRoom.hasUnconnectedNeighbor() )
+            {
+                Room nextRoom = currentRoom.getRandomUnconnectedNeighbor();
+                currentRoom.removeWallsBetween(nextRoom);
+                nextRoom.setConnected( true );
+                activeRoomList.add(0, nextRoom);
+            }
+
+            {
+                // this room has no more adjacent unconnected rooms
+                // so there is no reason to keep it in the list
+                activeRoomList.remove( currentRoom );
+            }
+        }
+
+        int wallsToRemove = 24;
+        while (wallsToRemove > 0)
+        {
+            int gridX = (int)Math.floor( Math.random() * roomCountX );
+            int gridY = (int)Math.floor( Math.random() * roomCountY );
+            int direction = (int)Math.floor( Math.random() * 4 );
+            Room room = roomGrid[gridX][gridY];
+            if ( room.hasNeighbor(direction) && room.hasWall(direction) )
+            {
+                room.removeWalls(direction);
+                wallsToRemove--;
+            }
+        }
     }
     public Room getRoom(int gridX, int gridY)
     { return roomGrid[gridX][gridY]; }

@@ -11,6 +11,8 @@ public class Room extends BaseActor
     public static int[] directionArray = {NORTH, SOUTH, EAST, WEST};
     private Wall[] wallArray;
     private Room[] neighborArray;
+    private boolean connected;
+
     public Room(float x, float y, Stage s)
     {
         super(x,y,s);
@@ -26,6 +28,8 @@ public class Room extends BaseActor
         wallArray[EAST] = new Wall(x+w-t,y, t,h, s);
         neighborArray = new Room[4];
         // contents of this array will be initialized by Maze class
+
+        connected = false;
     }
     public void setNeighbor(int direction, Room neighbor)
     { neighborArray[direction] = neighbor; }
@@ -61,5 +65,32 @@ public class Room extends BaseActor
             this.wallArray[WEST].remove();
             other.wallArray[EAST].remove();
         }
+    }
+
+    public void setConnected(boolean b)
+    { connected = b; }
+    public boolean isConnected()
+    { return connected; }
+    public boolean hasUnconnectedNeighbor()
+    {
+        for (int direction : directionArray)
+        {
+            if ( hasNeighbor(direction) && !getNeighbor(direction).isConnected() )
+                return true;
+        }
+        return false;
+    }
+
+    public Room getRandomUnconnectedNeighbor()
+    {
+        ArrayList<Integer> directionList = new ArrayList<Integer>();
+        for (int direction : directionArray)
+        {
+            if ( hasNeighbor(direction) && !getNeighbor(direction).isConnected() )
+                directionList.add(direction);
+        }
+        int directionIndex = (int)Math.floor( Math.random() * directionList.size() );
+        int direction = directionList.get(directionIndex);
+        return getNeighbor(direction);
     }
 }
