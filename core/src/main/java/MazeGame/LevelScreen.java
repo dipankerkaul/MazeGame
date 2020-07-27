@@ -6,6 +6,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 public class LevelScreen extends BaseScreen
 {
@@ -14,6 +19,8 @@ public class LevelScreen extends BaseScreen
     Ghost ghost;
     Label coinsLabel;
     Label messageLabel;
+    Sound coinSound;
+    Music windMusic;
 
     public void initialize()
     {
@@ -42,6 +49,11 @@ public class LevelScreen extends BaseScreen
         uiTable.add(coinsLabel);
         uiTable.row();
         uiTable.add(messageLabel).expandY();
+        coinSound = Gdx.audio.newSound(Gdx.files.internal("coin.wav"));
+        windMusic = Gdx.audio.newMusic(Gdx.files.internal("wind.mp3"));
+        windMusic.setLooping(true);
+        windMusic.setVolume(0.1f);
+        windMusic.play();
     }
     public void update(float dt)
     {
@@ -61,6 +73,7 @@ public class LevelScreen extends BaseScreen
             if (hero.overlaps(coin))
             {
                 coin.remove();
+                coinSound.play(0.10f);
             }
         }
         int coins = BaseActor.count(mainStage, Coin.class);
@@ -84,6 +97,15 @@ public class LevelScreen extends BaseScreen
             messageLabel.setText("Game Over");
             messageLabel.setColor(Color.RED);
             messageLabel.setVisible(true);
+        }
+
+        if ( !messageLabel.isVisible() )
+        {
+            float distance = new Vector2(hero.getX() - ghost.getX(), hero.getY() - ghost.getY()).len();
+            float volume = -(distance - 64)/(300 - 64) + 1;
+
+            volume = MathUtils.clamp(volume, 0.10f, 1.00f);
+            windMusic.setVolume(volume);
         }
 
     }
