@@ -12,6 +12,8 @@ public class Room extends BaseActor
     private Wall[] wallArray;
     private Room[] neighborArray;
     private boolean connected;
+    private boolean visited;
+    private Room previousRoom;
 
     public Room(float x, float y, Stage s)
     {
@@ -30,6 +32,7 @@ public class Room extends BaseActor
         // contents of this array will be initialized by Maze class
 
         connected = false;
+        visited = false;
     }
     public void setNeighbor(int direction, Room neighbor)
     { neighborArray[direction] = neighbor; }
@@ -92,5 +95,27 @@ public class Room extends BaseActor
         int directionIndex = (int)Math.floor( Math.random() * directionList.size() );
         int direction = directionList.get(directionIndex);
         return getNeighbor(direction);
+    }
+
+    public void setVisited(boolean b)
+    { visited = b; }
+    public boolean isVisited()
+    { return visited; }
+    public void setPreviousRoom(Room r)
+    { previousRoom = r; }
+    public Room getPreviousRoom()
+    { return previousRoom; }
+    // Used in pathfinding: locate accessible neighbors that have not yet been visited
+    public ArrayList<Room> unvisitedPathList()
+    {
+        ArrayList<Room> list = new ArrayList<Room>();
+
+        for (int direction : directionArray)
+        {
+            if ( hasNeighbor(direction) && !hasWall(direction) &&
+                    !getNeighbor(direction).isVisited() )
+                list.add( getNeighbor(direction) );
+        }
+        return list;
     }
 }

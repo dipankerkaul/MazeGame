@@ -7,6 +7,7 @@ public class LevelScreen extends BaseScreen
 {
     Maze maze;
     Hero hero;
+    Ghost ghost;
 
     public void initialize()
     {
@@ -17,12 +18,20 @@ public class LevelScreen extends BaseScreen
         maze = new Maze(mainStage);
         hero = new Hero(0,0,mainStage);
         hero.centerAtActor( maze.getRoom(0,0) );
+        ghost = new Ghost(0,0,mainStage);
+        ghost.centerAtActor( maze.getRoom(11,9) );
     }
     public void update(float dt)
     {
         for (BaseActor wall : BaseActor.getList(mainStage, Wall.class))
         {
             hero.preventOverlap(wall);
+        }
+
+        if (ghost.getActions().size == 0)
+        {
+            maze.resetRooms();
+            ghost.findPath( maze.getRoom(ghost), maze.getRoom(hero) );
         }
 
     }
@@ -32,4 +41,6 @@ public class LevelScreen extends BaseScreen
             BaseGame.setActiveScreen( new LevelScreen() );
         return false;
     }
+
+
 }
